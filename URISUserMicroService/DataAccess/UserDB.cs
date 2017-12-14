@@ -26,6 +26,7 @@ namespace URISUserMicroService.DataAccess
             retVal.Phone = reader["Phone"] as string;
             retVal.UserTypeId = (int)reader["UserTypeId"];
             retVal.Active = (bool)reader["Active"];
+            retVal.LastName = reader["LastName"] as string;
 
             return retVal;
         }
@@ -49,7 +50,8 @@ namespace URISUserMicroService.DataAccess
                     [User].[CountryName],
                     [User].[Phone],
                     [User].[UserTypeId],
-	                [User].[Active]
+	                [User].[Active],
+                    [User].[LastName]
                 ";
             }
         }
@@ -67,6 +69,7 @@ namespace URISUserMicroService.DataAccess
             command.AddParameter("@UserTypeId", SqlDbType.Int, user.UserTypeId);
             command.AddParameter("@Password", SqlDbType.NVarChar, user.Password);
             command.AddParameter("@Active", SqlDbType.Bit, user.Active);
+            command.AddParameter("@LastName", SqlDbType.NVarChar, user.LastName);
         }
 
         private static object CreateLikeQueryString(string str)
@@ -78,6 +81,7 @@ namespace URISUserMicroService.DataAccess
         {
             try
             {
+                
                 List<User> retVal = new List<User>();
 
                 using (SqlConnection connection = new SqlConnection(DBFunctions.ConnectionString))
@@ -120,7 +124,9 @@ namespace URISUserMicroService.DataAccess
                     {
                         while (reader.Read())
                         {
-                            retVal.Add(ReadRow(reader));
+                            User user = new User();
+                            user = ReadRow(reader);
+                            retVal.Add(user);
                         }
                     }
                 }
@@ -150,7 +156,6 @@ namespace URISUserMicroService.DataAccess
                         WHERE
                             [Id] = @Id
                     ", AllColumnSelect);
-
                     command.AddParameter("@Id", SqlDbType.Int, userId);
                     connection.Open();
 
@@ -197,7 +202,8 @@ namespace URISUserMicroService.DataAccess
                             [Phone],
                             [UserTypeId],
                             [Password],
-                            [Active]                
+                            [Active],
+                            [LastName]
                         )
                         VALUES
                         (
@@ -210,7 +216,8 @@ namespace URISUserMicroService.DataAccess
                             @Phone,
                             @UserTypeId,
                             @Password,
-                            @Active 
+                            @Active,
+                            @LastName
                         )
                         SET @Id = SCOPE_IDENTITY();
 						SELECT @Id as Id  
@@ -270,7 +277,8 @@ namespace URISUserMicroService.DataAccess
                             [CountryName] = @CountryName,
                             [Phone] = @Phone,
                             [UserTypeId] = @UserTypeId,                    
-                            [Active] = @Active
+                            [Active] = @Active,
+                            [LastName] = @LastName
                         WHERE
                             [Id] = @Id
                     ");
